@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "600465649440",
+    "project_id": "ar-smart-78671",
+    "storage_bucket": "ar-smart-78671.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600465649440:android:4b3678ea54c6212581b145",
+        "android_client_info": {
+          "package_name": "com.example.arsmart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiTujZmzUCPDW9iPjwR8ne39QVNaCHMCs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
