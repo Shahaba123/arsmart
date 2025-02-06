@@ -1,3 +1,4 @@
+import 'package:arsmart/user/user%20login.dart';
 import 'package:flutter/material.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       );
       return;
     }
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Proceeding as $_selectedRole')),
     );
@@ -56,6 +57,12 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               value: 'User',
               groupValue: _selectedRole,
               onChanged: (value) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserLoginScreen(),
+                    ));
+
                 setState(() {
                   _selectedRole = value;
                 });
@@ -76,14 +83,18 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               onPressed: _register,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
-                padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 30.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 14.0, horizontal: 30.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
               child: const Text(
                 'Proceed',
-                style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ],

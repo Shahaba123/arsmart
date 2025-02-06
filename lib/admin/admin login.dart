@@ -1,15 +1,15 @@
-import 'package:arsmart/user/forgot.dart';
+import 'package:arsmart/admin/forgot.dart'; // Admin Forgot Password Page
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class UserLoginScreen extends StatefulWidget {
-  const UserLoginScreen({super.key});
+class AdminLoginScreen extends StatefulWidget {
+  const AdminLoginScreen({super.key});
 
   @override
-  State<UserLoginScreen> createState() => _UserLoginScreenState();
+  State<AdminLoginScreen> createState() => _AdminLoginScreenState();
 }
 
-class _UserLoginScreenState extends State<UserLoginScreen> {
+class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -23,15 +23,16 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
           password: _passwordController.text.trim(),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login successful!")),
+          const SnackBar(content: Text("Admin Login Successful ✅")),
         );
-        // Navigate to the home screen or dashboard
+        // Navigate to the Admin Dashboard (Replace with your route)
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminDashboardScreen()));
       } on FirebaseAuthException catch (e) {
         String errorMessage = "An error occurred.";
         if (e.code == 'user-not-found') {
-          errorMessage = 'No user found for this email.';
+          errorMessage = 'No admin found with this email.';
         } else if (e.code == 'wrong-password') {
-          errorMessage = 'Incorrect password.';
+          errorMessage = 'Incorrect admin password.';
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),
@@ -42,20 +43,20 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
 
   void _forgotPassword() async {
     Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ForgotPasswordScreen(),
-                    ));
+        context,
+        MaterialPageRoute(
+          builder: (context) => ForgotPasswordScreen(),
+        ));
     if (_emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter your email to reset password.")),
+        const SnackBar(content: Text("Enter your email to reset password.")),
       );
       return;
     }
     try {
       await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Password reset link sent to your email.")),
+        const SnackBar(content: Text("Password reset link sent to admin email.")),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -70,7 +71,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+            colors: [Color(0xFF0A192F), Color(0xFF1976D2)], // Dark Blue to Light Blue
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -81,7 +82,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
             child: Form(
               key: _formKey,
               child: Card(
-                elevation: 10,
+                elevation: 12,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -90,39 +91,45 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      const Icon(Icons.admin_panel_settings, size: 60, color: Colors.blue),
+                      const SizedBox(height: 10),
                       const Text(
-                        "User Login",
+                        "Admin Login",
                         style: TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: Colors.black,
                         ),
                       ),
                       const SizedBox(height: 20),
+
+                      // Email Field
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
-                          labelText: "Email",
-                          hintText: "Enter your email",
-                          prefixIcon: const Icon(Icons.email),
+                          labelText: "Admin Email",
+                          hintText: "Enter Admin Email",
+                          prefixIcon: const Icon(Icons.email, color: Colors.blue),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your email";
+                            return "Please enter admin email";
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 15),
+
+                      // Password Field
                       TextFormField(
                         controller: _passwordController,
                         decoration: InputDecoration(
-                          labelText: "Password",
-                          hintText: "Enter your password",
-                          prefixIcon: const Icon(Icons.lock),
+                          labelText: "Admin Password",
+                          hintText: "Enter Admin Password",
+                          prefixIcon: const Icon(Icons.lock, color: Colors.blue),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -130,12 +137,14 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your password";
+                            return "Please enter admin password";
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 10),
+
+                      // Forgot Password
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
@@ -147,11 +156,12 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
+
+                      // Login Button
                       ElevatedButton(
                         onPressed: _login,
-                        
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
+                          backgroundColor: Colors.blue.shade900,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 40,
                             vertical: 12,
@@ -176,3 +186,6 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
     );
   }
 }
+
+
+

@@ -1,7 +1,11 @@
-import 'package:arsmart/choosescreen.dart';
+import 'package:arsmart/admin/admin%20login.dart';
+import 'package:arsmart/choose.dart';
 import 'package:arsmart/firebase_options.dart';
+import 'package:arsmart/seller/seller%20forgot.dart';
+import 'package:arsmart/seller/seller%20login.dart';
 import 'package:arsmart/seller/seller%20signup%20screen.dart';
 import 'package:arsmart/user/edit%20profile.dart';
+import 'package:arsmart/user/forgot.dart';
 import 'package:arsmart/user/user%20login.dart';
 //import 'package:arsmart/seller/seller%20signup.dart';
 import 'package:arsmart/user/user%20signup%20screen.dart';
@@ -43,7 +47,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const UserSignupScreen(),
+      home: SellerLoginScreen(),
     );
   }
 }
