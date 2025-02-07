@@ -1,4 +1,5 @@
 import 'package:arsmart/user/forgot.dart';
+import 'package:arsmart/user/userhome.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -25,6 +26,13 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Login successful!")),
         );
+        {
+          Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserHomePage(),
+                    ));
+        }
         // Navigate to the home screen or dashboard
       } on FirebaseAuthException catch (e) {
         String errorMessage = "An error occurred.";

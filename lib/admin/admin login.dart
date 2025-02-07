@@ -45,7 +45,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ForgotPasswordScreen(),
+          builder: (context) => AdminForgotPasswordScreen(),
         ));
     if (_emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,3 +1,5 @@
+import 'package:arsmart/admin/admin%20login.dart';
+import 'package:arsmart/seller/seller%20login.dart';
 import 'package:arsmart/user/user%20login.dart';
 import 'package:flutter/material.dart';
 
@@ -47,6 +49,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               value: 'Admin',
               groupValue: _selectedRole,
               onChanged: (value) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminLoginScreen(),
+                    ));
                 setState(() {
                   _selectedRole = value;
                 });
@@ -73,6 +80,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               value: 'Seller',
               groupValue: _selectedRole,
               onChanged: (value) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SellerLoginScreen(),
+                    ));
                 setState(() {
                   _selectedRole = value;
                 });
