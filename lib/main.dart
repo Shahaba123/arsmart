@@ -1,10 +1,18 @@
+import 'package:arsmart/admin/admin%20home.dart';
 import 'package:arsmart/admin/admin%20login.dart';
+import 'package:arsmart/admin/seller%20manage.dart';
+import 'package:arsmart/admin/user%20manage.dart';
+import 'package:arsmart/admin/view%20feedback.dart';
+import 'package:arsmart/admin/view%20order.dart';
 import 'package:arsmart/choose.dart';
 import 'package:arsmart/firebase_options.dart';
+import 'package:arsmart/seller/product%20screen.dart';
 import 'package:arsmart/seller/seller%20forgot.dart';
 import 'package:arsmart/seller/seller%20home.dart';
 import 'package:arsmart/seller/seller%20login.dart';
 import 'package:arsmart/seller/seller%20signup%20screen.dart';
+import 'package:arsmart/seller/view%20feedback.dart';
+import 'package:arsmart/seller/view%20order.dart';
 import 'package:arsmart/user/edit%20profile.dart';
 import 'package:arsmart/user/forgot.dart';
 import 'package:arsmart/user/user%20login.dart';
@@ -48,7 +56,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: SellerHomeScreen(),
+      home: AdminFeedbackApp(),
     );
   }
 }
