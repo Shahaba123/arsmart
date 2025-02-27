@@ -310,12 +310,18 @@
 //     );
 //   }
 // }
-import 'dart:io';
-import 'package:arsmart/helper.dart';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MaterialApp(home: UserSignupScreen(), debugShowCheckedModeBanner: false));
+}
 
 class UserSignupScreen extends StatefulWidget {
   const UserSignupScreen({super.key});
@@ -328,55 +334,35 @@ class _UserSignupScreenState extends State<UserSignupScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
 
-  String? _selectedGender = 'Male'; // Default gender
-  File? _profileImage;
-  final ImagePicker _picker = ImagePicker();
-
+  String? _selectedGender = 'Male';
+  Uint8List? _profileImage;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
+    Uint8List? pickedImage = await ImagePickerWeb.getImageAsBytes();
+    if (pickedImage != null) {
       setState(() {
-        _profileImage = File(pickedFile.path);
+        _profileImage = pickedImage;
       });
     } else {
       _showSnackBar("No image selected");
     }
   }
 
-  Future<String?> _uploadProfileImage() async {
-    if (_profileImage == null) return null;
-
-    try {
-      String? fileName = await uploadImageToCloudinary(_profileImage!.path);
-      return fileName;
-    } catch (e) {
-      print("Error uploading image: $e");
-      return null;
-    }
-  }
-
   Future<void> _selectDateOfBirth(BuildContext context) async {
-    DateTime initialDate = DateTime.now();
-    DateTime firstDate = DateTime(1900);
-    DateTime lastDate = DateTime.now();
-
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
     );
 
-    if (picked != null && picked != initialDate) {
+    if (picked != null) {
       setState(() {
         _dobController.text = "${picked.toLocal()}".split(' ')[0];
       });
@@ -392,13 +378,7 @@ class _UserSignupScreenState extends State<UserSignupScreen> {
     final dob = _dobController.text.trim();
     final gender = _selectedGender;
 
-    if (name.isEmpty ||
-        email.isEmpty ||
-        password.isEmpty ||
-        confirmPassword.isEmpty ||
-        phone.isEmpty ||
-        dob.isEmpty ||
-        gender == null) {
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty || phone.isEmpty || dob.isEmpty || gender == null) {
       _showSnackBar("Please fill all fields");
       return;
     }
@@ -409,18 +389,9 @@ class _UserSignupScreenState extends State<UserSignupScreen> {
     }
 
     try {
-      // Create user with Firebase Authentication
-      final userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
+      final userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       final uid = userCredential.user?.uid;
 
-      // Upload the profile image if available
-      String? profileImageUrl = await _uploadProfileImage();
-
-      // Add user data to Firestore
       await _firestore.collection('users').doc(uid).set({
         'name': name,
         'email': email,
@@ -428,12 +399,10 @@ class _UserSignupScreenState extends State<UserSignupScreen> {
         'dob': dob,
         'gender': gender,
         'uid': uid,
-        'profileImage': profileImageUrl,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
       _showSnackBar("Sign up successful!");
-      // Navigate to another screen, e.g., Home
     } on FirebaseAuthException catch (e) {
       _showSnackBar(e.message ?? "An error occurred");
     } catch (e) {
@@ -442,170 +411,53 @@ class _UserSignupScreenState extends State<UserSignupScreen> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          "Create Account",
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ),
       body: Stack(
         children: [
-          // Background Gradient
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.lightBlue.shade400, Colors.lightBlue.shade400],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          _buildBackground(),
+          Center(
+            child: Container(
+              width: 500,
+              padding: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Colors.white.withOpacity(0.3)),
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 15, spreadRadius: 3)],
               ),
-            ),
-          ),
-          // Form Container
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                SizedBox(height: 120),
-                // Profile Photo
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.grey.shade300,
-                    backgroundImage: _profileImage != null
-                        ? FileImage(_profileImage!)
-                        : null,
-                    child: _profileImage == null
-                        ? Icon(Icons.camera_alt, color: Colors.white, size: 30)
-                        : null,
-                  ),
-                ),
-                SizedBox(height: 16),
-
-                // Name Field
-                _buildTextField(
-                  controller: _nameController,
-                  label: 'Full Name',
-                  hintText: 'Enter your full name',
-                  icon: Icons.person,
-                ),
-                SizedBox(height: 16),
-
-                // Email Field
-                _buildTextField(
-                  controller: _emailController,
-                  label: 'Email Address',
-                  hintText: 'Enter your email',
-                  icon: Icons.email,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: 16),
-
-                // Phone Field
-                _buildTextField(
-                  controller: _phoneController,
-                  label: 'Phone Number',
-                  hintText: 'Enter your phone number',
-                  icon: Icons.phone,
-                  keyboardType: TextInputType.phone,
-                ),
-                SizedBox(height: 16),
-
-                // Date of Birth Field
-                GestureDetector(
-                  onTap: () => _selectDateOfBirth(context),
-                  child: AbsorbPointer(
-                    child: _buildTextField(
-                      controller: _dobController,
-                      label: 'Date of Birth',
-                      hintText: 'Select your date of birth',
-                      icon: Icons.calendar_today,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildProfileImage(),
+                    SizedBox(height: 16),
+                    _buildTextField(_nameController, "Full Name", Icons.person),
+                    _buildTextField(_emailController, "Email", Icons.email, keyboardType: TextInputType.emailAddress),
+                    _buildTextField(_phoneController, "Phone", Icons.phone, keyboardType: TextInputType.phone),
+                    GestureDetector(
+                      onTap: () => _selectDateOfBirth(context),
+                      child: AbsorbPointer(
+                        child: _buildTextField(_dobController, "Date of Birth", Icons.calendar_today),
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 16),
-
-                // Gender Dropdown
-                DropdownButtonFormField<String>(
-                  value: _selectedGender,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.person,
-                        color: const Color.fromARGB(255, 17, 16, 16)),
-                    labelText: 'Gender',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
+                    _buildGenderDropdown(),
+                    _buildTextField(_passwordController, "Password", Icons.lock, obscureText: true),
+                    _buildTextField(_confirmPasswordController, "Confirm Password", Icons.lock, obscureText: true),
+                    SizedBox(height: 20),
+                    _buildSignupButton(),
+                    SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("Already have an account? Sign In", style: TextStyle(color: Colors.white)),
                     ),
-                  ),
-                  items: ['Male', 'Female', 'Other']
-                      .map((gender) => DropdownMenuItem<String>(
-                            value: gender,
-                            child: Text(gender),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGender = value;
-                    });
-                  },
+                  ],
                 ),
-                SizedBox(height: 16),
-
-                // Password Field
-                _buildTextField(
-                  controller: _passwordController,
-                  label: 'Password',
-                  hintText: 'Enter a strong password',
-                  icon: Icons.lock,
-                  obscureText: true,
-                ),
-                SizedBox(height: 16),
-
-                // Confirm Password Field
-                _buildTextField(
-                  controller: _confirmPasswordController,
-                  label: 'Confirm Password',
-                  hintText: 'Re-enter your password',
-                  icon: Icons.lock,
-                  obscureText: true,
-                ),
-                SizedBox(height: 30),
-
-                // Submit Button
-                ElevatedButton(
-                  onPressed: _signUpUser,
-                  style: ElevatedButton.styleFrom(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 80.0),
-                    backgroundColor: const Color.fromARGB(255, 226, 76, 17),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    elevation: 5,
-                    textStyle: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  child: Text("Sign Up"),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -613,45 +465,79 @@ class _UserSignupScreenState extends State<UserSignupScreen> {
     );
   }
 
-  // Custom TextField Widget with styling
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    required IconData icon,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
+  Widget _buildBackground() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
+        gradient: LinearGradient(
+          colors: [Color(0xff2980B9), Color(0xff6DD5FA)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    return GestureDetector(
+      onTap: _pickImage,
+      child: CircleAvatar(
+        radius: 60,
+        backgroundColor: Colors.white.withOpacity(0.3),
+        backgroundImage: _profileImage != null ? MemoryImage(_profileImage!) : null,
+        child: _profileImage == null ? Icon(Icons.camera_alt, color: Colors.white, size: 30) : null,
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool obscureText = false, TextInputType keyboardType = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
+        style: TextStyle(color: Colors.white),
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: const Color.fromARGB(255, 15, 15, 15)),
           labelText: label,
-          hintText: hintText,
-          hintStyle: TextStyle(color: Colors.grey[600]),
-          labelStyle: TextStyle(color: const Color.fromARGB(255, 25, 23, 23)),
+          prefixIcon: Icon(icon, color: Colors.white),
           filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30.0),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          fillColor: Colors.white.withOpacity(0.2),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+          labelStyle: TextStyle(color: Colors.white),
         ),
       ),
     );
   }
+
+  Widget _buildGenderDropdown() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: DropdownButtonFormField<String>(
+        value: _selectedGender,
+        decoration: InputDecoration(
+          prefixIcon: Icon(Icons.person, color: Colors.white),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.2),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+        ),
+        dropdownColor: Colors.blueAccent,
+        items: ['Male', 'Female', 'Other'].map((gender) => DropdownMenuItem<String>(value: gender, child: Text(gender, style: TextStyle(color: Colors.white)))).toList(),
+        onChanged: (value) => setState(() => _selectedGender = value),
+      ),
+    );
+  }
+
+  Widget _buildSignupButton() {
+    return ElevatedButton(
+      onPressed: _signUpUser,
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        backgroundColor: Colors.orange,
+      ),
+      child: Text("Sign Up", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+    );
+  }
 }
+
+

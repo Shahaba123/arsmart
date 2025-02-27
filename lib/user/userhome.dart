@@ -1,3 +1,5 @@
+import 'package:arsmart/user/categories.dart';
+import 'package:arsmart/user/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class UserHomePage extends StatefulWidget {
@@ -12,7 +14,7 @@ class _UserHomePageState extends State<UserHomePage> {
 
   final List<Widget> _pages = [
     HomeScreen(),
-    CategoriesScreen(),
+    Categories(),
     AccountScreen(),
     CartScreen(),
     OrdersScreen(),
@@ -30,8 +32,6 @@ class _UserHomePageState extends State<UserHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-
-      // Stylish Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -93,32 +93,32 @@ PreferredSizeWidget customAppBar(String title) {
 }
 
 // Home Screen
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: customAppBar("Home"),
-      body: Center(
-        child: Text("Welcome to ARSmart Home!", 
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-}
+// class HomeScreen extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: customAppBar("Home"),
+//       body: Center(
+//         child: Text("Welcome to ARSmart Home!", 
+//           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+//       ),
+//     );
+//   }
+// }
 
 // Categories Screen
-class CategoriesScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: customAppBar("Categories"),
-      body: Center(
-        child: Text("Explore various product categories!", 
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-}
+// class CategoriesScreen extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: customAppBar("Categories"),
+//       body: Center(
+//         child: Text("Explore various product categories!", 
+//           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+//       ),
+//     );
+//   }
+// }
 
 // Account Screen
 class AccountScreen extends StatelessWidget {

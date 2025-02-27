@@ -13,6 +13,7 @@ import 'package:arsmart/seller/seller%20login.dart';
 import 'package:arsmart/seller/seller%20signup%20screen.dart';
 import 'package:arsmart/seller/view%20feedback.dart';
 import 'package:arsmart/seller/view%20order.dart';
+import 'package:arsmart/user/categories.dart';
 import 'package:arsmart/user/edit%20profile.dart';
 import 'package:arsmart/user/forgot.dart';
 import 'package:arsmart/user/order.dart';
@@ -59,7 +60,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: UserHomePage(),
+      home:  UserHomePage(),
     );
   }
 }

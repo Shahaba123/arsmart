@@ -22,7 +22,7 @@ class BuyNowScreen extends StatefulWidget {
 class _BuyNowScreenState extends State<BuyNowScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String _selectedPaymentMethod = "Cash on Delivery"; // Default payment method
+  String _selectedPaymentMethod = "Cash on Delivery"; // Default method
 
   void _confirmOrder() async {
     User? user = _auth.currentUser;
@@ -41,7 +41,7 @@ class _BuyNowScreenState extends State<BuyNowScreen> {
         SnackBar(content: Text('Order placed successfully!')),
       );
 
-      Navigator.pop(context); // Return to previous screen
+      Navigator.pop(context); // Go back after order
     }
   }
 
@@ -69,22 +69,16 @@ class _BuyNowScreenState extends State<BuyNowScreen> {
             SizedBox(height: 20),
 
             // Product Details
-            Text(
-              widget.productName,
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
+            Text(widget.productName, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text("Price: \$${widget.price}", style: TextStyle(fontSize: 18, color: Colors.green)),
             SizedBox(height: 20),
 
             // Payment Method Selection
-            Text(
-              "Select Payment Method:",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            Text("Select Payment Method:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
 
-            // Payment Method Radio Buttons
+            // Payment Options
             Column(
               children: [
                 ListTile(
@@ -129,3 +123,4 @@ class _BuyNowScreenState extends State<BuyNowScreen> {
     );
   }
 }
+
